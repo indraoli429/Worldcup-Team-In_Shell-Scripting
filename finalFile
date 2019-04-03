@@ -1,0 +1,179 @@
+#!/bin/ksh
+# Indra Bahadur Oli
+
+#seventh step (choose three player code)
+choosePlayer(){
+  PS3="Please choose any number form above list:- "
+  select Players in $player1 $player2 $player3
+  do
+  	if [[ -z "$Players" ]]
+  		then
+  			echo "You typed a wrong number. Please Try Again!"
+  			choosePlayer #restart this function if input is wrong
+  		else
+        echo "You choose '$Players' as your favourite player."
+        case $Players in
+        	"KAG" | "kag") cat kag
+        	;;
+        	"MES" | "mes") cat mes
+        	;;
+        	"REU" | "reu") cat reu
+        	;;
+        	"LOR" | "lor") cat lor
+        	;;
+          "COU" | "cou") cat cou
+        	;;
+        	*) echo "Player not match."
+        	;;
+        esac
+
+        echo -e "Do you want restart the program (yes|no):- \c"
+        read response
+        if [[ $response == yes ]];
+        then
+          WorldcupCountry
+        fi
+  	fi
+  	break
+  done
+}
+
+#Sixth step (choose three player name using player code)
+setPlayer(){
+  echo -e "\nEnter any 3 Players code from above list (seperated by space):- \c"
+  read player1 player2 player3
+  if [ $player1 == "KAG" -o $player1 == "MES" -o $player1 == "REU" -o $player1 == "LOR" -o $player1 == "COU" ];
+  then
+    if [[ $player2 != $player1 ]];
+    then
+      if [ $player2 == "KAG" -o $player2 == "MES" -o $player2 == "REU" -o $player2 == "LOR" -o $player2 == "COU" ];
+      then
+        if [[ $player3 != $player1 ]];
+        then
+          if [[ $player3 != $player2 ]];
+          then
+            if [ $player3 == "KAG" -o $player3 == "MES" -o $player3 == "REU" -o $player3 == "LOR" -o $player3 == "COU" ];
+            then
+              choosePlayer #seventh step (run this function if user enter a 3 valid player code)
+            else
+              echo -e "Third player '$player3' name is not found in the database\nTry Again!"
+              setPlayer
+            fi
+          else
+            echo "The $player3 already choosed in second"
+            setPlayer
+          fi
+        else
+          echo "The $player3 already choosed in first"
+          setPlayer
+        fi
+      else
+        echo -e "Second player '$player2' or more player is not found in the database\nTry Again!"
+        setPlayer
+      fi
+    else
+      echo "The '$player2' is already choosed"
+      setPlayer
+    fi
+  else
+    echo -e "First player '$player1' or more player is not found in the database\nTry Again!"
+    setPlayer
+  fi
+}
+
+#Fifth step (display the player name with player code)
+playerList(){
+  echo "Top 5 Worldcup played players"
+  echo "------------------------------------"
+  echo -e "Player Name \t\tPlayer Code"
+  echo -e "Kagawa \t\t\tKAG"
+  echo -e "Messi \t\t\tMES"
+  echo -e "Rues \t\t\tREU"
+  echo -e "LLoris \t\t\tLOR"
+  echo -e "Coutinho \t\tCOU"
+
+  setPlayer #got to sixth step
+}
+
+#fourth step (choose the best country code)
+chooseCountry(){
+  countryCode="FAR"
+  echo "Try to guess the FIFA 2018 champion team"
+  until [ "$country" = "$countryCode" ]
+  do
+    echo -e "your guess: \c"
+    read country
+    if [ $country == "JPN" -o $country == "ARG" -o $country == "GER" -o $country == "FAR" -o $country == "BRZ" ];
+    then
+      if [[ "$country" = "$countryCode" ]]
+      then
+        break
+      else
+        echo "Sorry!! Provide country code not won the FIFA 2018 Worldcup"
+      fi
+    else
+      echo "Sorry!! Country code not in the list"
+    fi
+  done
+  echo -e "Congratulation!! you choosed France\nAnd France National Football team won the FIFA 2018 worldcup"
+  country="" #set empty country variable
+
+  playerList	#go to fifth step
+}
+
+#Third Step (display the country name with country code)
+WorldcupCountry(){
+  echo -e "\nTop 5 Worldcup played country"
+  echo "------------------------------------"
+  echo -e "Country name\t\tCountry code"
+  echo -e "Japan  \t\t\tJPN"
+  echo -e "Argentina  \t\tARG"
+  echo -e "Germany  \t\tGER"
+  echo -e "France  \t\tFAR"
+  echo -e "Brazil  \t\tBRZ"
+
+  chooseCountry	#go to fourth step
+}
+
+#Second step (checking secret key)
+checking(){
+		count=0	#count is a variable
+		num2=2
+		while [ $count -lt 3 ];
+		do
+			echo -e "Enter your Secret key:- \c"
+			read -s skey
+			if [[ $skey == indra ]];
+      then
+
+        echo -e "\n\nLogin successful\nlogin id: \t$id"
+        echo -e "Username: \t$name \nSecret key: \t(not visible for security reason)"
+				sessionDate=$(date)
+				echo -e "Login Session details:\n$sessionDate"
+
+        WorldcupCountry #go to WorldcupCountry function (Third Step)
+
+				break
+			else
+				if [[ $count == $num2 ]];
+        then
+					echo "Sorry! your credentials could not be verified."
+				else
+					echo "Try again!! you have $((num2-count)) more chance to enter a secret key."
+				fi
+			fi
+			count=`expr $count + 1` #the regular expression increments the value
+		done
+}
+
+#First Step
+if [[ $1 != "" && $2 != "" ]];
+then
+  # echo -e "User Name:- \t$1"
+  # echo -e "User ID:- \t$2\n"
+  name=$1
+  id=$2
+  checking #go to second step (Verify secret key to enter home page)
+else
+  echo -e "Username and UserID required!\n Please provide Username and UserID as a parameter."
+fi
