@@ -1,0 +1,166 @@
+#!/bin/bash
+#Indra Bahadur OLi (17031270)
+bestplayer(){
+PS3="choose best player form the top three list: "	#PS3 helps to choose the index
+  select bplayer in $p1 $p2 $p3		#print the value of $p1 $p2 $p3 with index
+  do
+    if [[ -z $bplayer ]]; then	#if index is not found in the $bplayer
+      echo "index not match"
+      bestplayer
+    else	#if user entered correct index
+      case $bplayer in	#if the choosed index value is matched any of the following 
+        "KAG") cat kag
+          ;;
+        "LOR") cat lor
+        ;;
+        "COU" ) cat cou
+        ;;
+        *)
+        flist	#if the any statement is not matched the program return back to first step that means football country list
+        ;;
+      esac
+      echo -e "do you wanna restart the program(Y/N): \c"
+      read an
+	ans="${an^^}"	#it convert to uppercase
+      if [ $ans == "Y" -o $ans == "YES" ]; then
+        flist
+      elif [ $ans == "N" -o $ans == "NO" ]; then
+        echo "Good Bye"
+        exit
+      else
+        echo "program terminate"
+        exit
+      fi
+    fi
+  done
+
+}
+cplayer(){
+  echo -e "choose three player form the list (sperate player with space): \c"
+  read p1 p2 p3
+  pl=($p1 $p2 $p3)	#store the value of $p1 $p2 $p3 in variable $pl
+  if [[ ${#pl[@]} -eq 3 ]]; then 	#${#pl[@]} return the lenght of variable $pl
+    case $p1 in	#if $p1 is form any of the following
+      "KAG" | "MES" | "REU" | "LOR" | "COU" )
+        if [[ $p2 == $p1 ]]; then	#if $p2 is chose in the first varaible $p1
+          echo "player 2 already taken in first position"
+          cplayer	#give the another chance to enter correct input
+        else
+          case $p2 in	#if $p2 is from any of the following
+            "KAG" | "MES" | "REU" | "LOR" | "COU" )
+              if [[ $p3 == $p1 ]]; then	#if $p3 is already chose in the firat variable $p1
+                echo "player 3 already taken in first position"
+                cplayer	#give the another chance to enter correct input
+              else
+                if [[ $p3 == $p2 ]]; then	#if $p3 is already chose in the second variable $p2
+                  echo "player 3 already taken in second position"
+                  cplayer	#give the another chance to enter correct input
+                else
+                  case $p3 in	#if $p3 is form any of the following
+                    "KAG" | "MES" | "REU" | "LOR" | "COU" )
+                    bestplayer	#if the all condition is matched it goes to select the fina best player
+                      ;;
+                      *)
+                        echo "Third player not in the list"
+                        cplayer	#give the another chance to enter correct input
+                      ;;
+                  esac
+
+                fi
+              fi
+              ;;
+              *)
+                echo "second player not in the list"
+                cplayer	#give the another chance to enter correct input
+              ;;
+          esac
+        fi
+        ;;
+        *)
+          echo "first player not in the list"
+          cplayer	#give the another chance to enter correct input
+        ;;
+    esac
+  elif [[ ${#pl[@]} -lt 3 ]]; then	# ${#pl[@]}  return the lenght of $pl variable
+    echo "at least three player required"
+    cplayer
+  else
+    echo "Only three player accepted"
+    cplayer
+  fi
+}
+
+plist(){
+	echo -e "\nTop five player list"
+	echo -e "Player name\tPlayer code"
+	plList="Kagwa\t\tKAG Reus\t\tREU Loris\t\tLOR Coutinho\tCOU"
+	for player in $plList	#it check the value form $plList variable and seperated by space
+	do
+		echo -e $player
+	done
+	cplayer #choose three player form the list
+}
+
+bestCountry(){
+echo "choose best country code form the list"
+  until [[ $guess == "GER" ]]; do	#while the condition is matched the until loop is closed
+    echo -e "enter your guess country code: \c"
+    read guess	#read form the user input
+    case $guess in	#if the input value $guess  form any of the following
+      "JPN" | "ARG" | "GER" | "FRA" | "BRZ")
+        if [[ $guess == "GER" ]]; then	#if the user input value $guess is equal to GER then break the until loop
+          break
+        else
+          echo "not match the country code try again!"
+        fi
+        ;;
+        *)
+          echo "Country code not in the list"
+        ;;
+    esac
+  done	#if the condition matched  the following statement is execute
+  echo "congratulationYou chose Germany"
+	guess=""
+  plist		#calling plist function 
+
+}
+
+flist(){
+	echo -e "\nTop five country list"
+	echo -e "Country name \tCountry code"
+	cList="Japan\t\tJPN Argentina\tARG Germany\t\tGER France\t\tFRA Brazil\t\tBRZ"
+	for country in $cList	#it check the value form $cList variable and seperated by space
+	do
+		echo -e $country
+	done
+	bestCountry #choose best country function
+}
+
+checkingkey(){
+	counter=3	#counter variable inatilized with value 3
+  while [[ $counter -gt 0 ]]; do	#while the condition is match the following statement are executed
+    echo -e "enter secret key: \c"
+    read -s key		#hide the key
+    if [[ $key == "indra123" ]]; then	#if the user input $key is equal to indra123 the following statement are executed
+      echo -e "\n\nWelcome $username"
+      echo -e "userid: $userid \ncurrent date: $(date)"
+      flist #function calling
+      break
+    else
+      echo "key not match try again"
+    fi
+    ((counter--))	#regular expression it decrement the value of counter
+  done
+}
+
+if [[ $1 == "" && $2 == "" ]];
+then
+	echo "Username and UserId required as a parameter"
+elif [[ $1 != "" && $2 == "" ]];
+then
+  echo -e "userid not found\nPlease enter a userid as a second parameter"
+else
+	username=$1	#username store the value of $1 (first parameter)
+	userid=$2	#userid store the value of $2 (second parameter)
+	checkingkey	#calling function to check the secret key
+fi
